@@ -27,6 +27,46 @@ if (isset($_GET["searchDP"])) {
     $result = $conexion->query($query);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 }
+
+// Verificar si el formulario fue enviado
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //print_r($_POST);
+    // Recolectamos los datos del método POST
+    $name = isset($_POST["name"]) ? $_POST["name"] : "";
+    $surname = isset($_POST["surname"]) ? $_POST["surname"] : "";
+    $second_surname = isset($_POST["second_surname"]) ? $_POST["second_surname"] : "";
+    $dia = isset($_POST["day"]) ? $_POST["day"] : "";
+    $mes = isset($_POST["month"]) ? $_POST["month"] : "";
+    $ano = isset($_POST["ano"]) ? $_POST["ano"] : "";     
+    $gender = isset($_POST["gender"]) ? $_POST["gender"] : "";
+    $state = isset($_POST["state"]) ? $_POST["state"] : "";
+
+    // Concatenamos el valor de dia, mes y año en el formato requerido
+    $birthday = isset($_POST["ano"]) && isset($_POST["month"]) && isset($_POST["day"]) ? $_POST["ano"] . "-" . $_POST["month"] . "-" . $_POST["day"] : "";
+
+    // Prepara la insercción de los datos
+    $sentencia = $conexion->prepare("INSERT INTO tbl_person(id,name,surname,second_surname,birthday,gender,state) VALUES (null,:name,:surname,:second_surname,:birthday,:gender,:state)");
+
+    // Asignando los valores que vienen del método POST
+    $sentencia->bindParam(":name", $name);
+    $sentencia->bindParam(":surname", $surname);
+    $sentencia->bindParam(":second_surname", $second_surname);
+    $sentencia->bindParam(":birthday", $birthday);
+    $sentencia->bindParam(":gender", $gender);
+    $sentencia->bindParam(":state", $state);
+    $sentencia->execute();
+
+    // Obtener el ID de la persona insertada
+    $id_persona = $conexion->lastInsertId();
+
+    // Preparar la inserción del CURP
+    $sentencia = $conexion->prepare("INSERT INTO tbl_curp(id,curp,id_person) VALUES (null,:curp,:id_person)");
+
+    // Asignar los valores a insertar en la tabla tbl_curp
+    $sentencia->bindParam(":id_person", $id_persona);
+    $sentencia->bindParam(":curp", $curp);
+    $sentencia->execute();
+}
 ?>
 
 <?php include("templates/header.php"); ?>
@@ -56,7 +96,7 @@ if (isset($_GET["searchDP"])) {
                 <button name="searchCURP" class="btn btn-primary float-end">Buscar</button>
             </form>
 
-            <?php if (isset($row) && isset($_GET["searchCURP"])): ?>
+            <?php if (isset($row) && isset($_GET["searchCURP"])) : ?>
                 <h5 class="mt-4">Información encontrada:</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -112,8 +152,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-segundo-apellido" class="form-label">Segundo Apellido*</label>
-                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido"
-                            required>
+                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-dia-nacimiento-dp" class="form-label">Día de Nacimiento*</label>
@@ -186,7 +225,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                 </div>
             </form>
-            <?php if (isset($row) && isset($_GET["searchDP"])): ?>
+            <?php if (isset($row) && isset($_GET["searchDP"])) : ?>
                 <h5>Información encontrada:</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -195,26 +234,25 @@ if (isset($_GET["searchDP"])) {
                         </p>
                     </div>
                 <?php endif; ?>
-            </div>
+                </div>
         </div>
 
 
         <div class="tab-pane fade border-top-0 border p-4" id="crear-curp">
-            <form>
+            <form method="POST" action="test.php">
                 <h4 class="mb-3">Datos Personales</h4>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="input-nombre" class="form-label">Nombre*</label>
-                        <input name="name" type="text" class="form-control" id="input-nombre-curp" required>
+                        <input name="name" type="text" class="form-control" id="name" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-primer-apellido" class="form-label">Primer Apellido*</label>
-                        <input name="surname" type="text" class="form-control" id="input-primer-apellido-curp" required>
+                        <input name="surname" type="text" class="form-control" id="surname" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-segundo-apellido" class="form-label">Segundo Apellido*</label>
-                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido-curp"
-                            required>
+                        <input name="second_surname" type="text" class="form-control" id="second_surname" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-dia-nacimiento-curp" class="form-label">Día de Nacimiento*</label>
@@ -239,7 +277,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-sexo" class="form-label">Sexo*</label>
-                        <select name="gender" class="form-select" id="input-sexo-curp" required>
+                        <select name="gender" class="form-select" id="gender" required>
                             <option value="">Seleccione</option>
                             <option value="Hombre">Hombre</option>
                             <option value="Mujer">Mujer</option>
@@ -247,7 +285,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-estado" class="form-label">Estado*</label>
-                        <select name="state" class="form-select mb-3" id="input-estado-curp" required>
+                        <select name="state" class="form-select mb-3" id="state" required>
                             <option value="">Seleccione</option>
                             <option value="Aguascalientes">Aguascalientes</option>
                             <option value="Baja California">Baja California</option>
@@ -282,8 +320,7 @@ if (isset($_GET["searchDP"])) {
                             <option value="Yucatán">Yucatán</option>
                             <option value="Zacatecas">Zacatecas</option>
                         </select>
-                        <button onclick="generarCURP()" name="createCURP"
-                            class="btn btn-primary float-end">Buscar</button>
+                        <button onclick="generarCURP()" name="createCURP" class="btn btn-primary float-end">Generar</button>
                     </div>
                 </div>
             </form>
@@ -293,17 +330,17 @@ if (isset($_GET["searchDP"])) {
     <script>
         function generarCURP() {
             // Obtener los valores de los campos del formulario
-            const nombre = document.querySelector('#input-nombre-curp').value.toUpperCase();
-            const apellidoPaterno = document.querySelector('#input-primer-apellido-curp').value.toUpperCase();
-            const apellidoMaterno = document.querySelector('#input-segundo-apellido-curp').value.toUpperCase();
+            const nombre = document.querySelector('#name').value.toUpperCase();
+            const apellidoPaterno = document.querySelector('#surname').value.toUpperCase();
+            const apellidoMaterno = document.querySelector('#second_surname').value.toUpperCase();
             const diaNacimiento = document.querySelector('#input-dia-nacimiento-curp').value;
             const mesNacimiento = document.querySelector('#input-mes-nacimiento-curp').value;
             const anoNacimiento = document.querySelector('#input-ano-nacimiento-curp').value.substring(2);
-            const sexo = document.querySelector('#input-sexo-curp').value.charAt(0);
-            const estado = document.querySelector('#input-estado-curp').value.substring(0, 2).toUpperCase();
+            const sexo = document.querySelector('#gender').value.charAt(0);
+            const estado = document.querySelector('#state').value.substring(0, 2).toUpperCase();
 
             // Generar el CURP
-            const curp = 
+            const curp =
                 apellidoPaterno.substring(0, 2) +
                 apellidoMaterno.charAt(0) +
                 nombre.charAt(0) +

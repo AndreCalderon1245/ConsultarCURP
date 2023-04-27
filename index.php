@@ -40,9 +40,6 @@ if (isset($_GET["searchDP"])) {
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#datos-personales">Datos Personales</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#crear-curp">Crear CURP</a>
-        </li>
     </ul>
 
     <div class="tab-content">
@@ -116,23 +113,33 @@ if (isset($_GET["searchDP"])) {
                             required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="input-dia-nacimiento" class="form-label">Día de Nacimiento*</label>
-                        <input name="day" type="number" class="form-control" id="input-dia-nacimiento" required>
+                        <label for="input-dia-nacimiento-dp" class="form-label">Día de Nacimiento*</label>
+                        <select name="day" class="form-control" id="input-dia-nacimiento-dp" required>
+                            <option value="">Seleccionar día</option>
+                            <!-- Opciones generadas dinámicamente -->
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="input-mes-nacimiento-dp" class="form-label">Mes de Nacimiento*</label>
+                        <select name="month" class="form-control" id="input-mes-nacimiento-dp" required>
+                            <option value="">Seleccionar mes</option>
+                            <!-- Opciones generadas dinámicamente -->
+                        </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="input-mes-nacimiento" class="form-label">Mes de Nacimiento*</label>
-                        <input name="month" type="number" class="form-control" id="input-mes-nacimiento" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-ano-nacimiento" class="form-label">Año de Nacimiento*</label>
-                        <input name="ano" type="number" class="form-control" id="input-ano-nacimiento" required>
+                        <label for="input-ano-nacimiento-dp" class="form-label">Año de Nacimiento*</label>
+                        <select name="ano" class="form-control" id="input-ano-nacimiento-dp" required>
+                            <option value="">Seleccionar año</option>
+                            <!-- Opciones generadas dinámicamente -->
+                        </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-sexo" class="form-label">Sexo*</label>
                         <select name="gender" class="form-select" id="input-sexo" required>
                             <option value="">Seleccione</option>
-                            <option value="Masculino">Masculino</option>
-                            <option value="Femenino">Femenino</option>
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -176,7 +183,6 @@ if (isset($_GET["searchDP"])) {
                     </div>
                 </div>
             </form>
-        </div>
             <?php if (isset($row) && isset($_GET["searchDP"])): ?>
                 <h5>Información encontrada:</h5>
                 <div class="row">
@@ -185,93 +191,58 @@ if (isset($_GET["searchDP"])) {
                             <?= $row["curp"] ?>
                         </p>
                     </div>
-            <?php endif; ?>
-                </div>
-
-        <div class="tab-pane fade border-top-0 border p-4" id="crear-curp">
-            <form>
-                <h4 class="mb-3">Crear CURP</h4>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="input-nombre" class="form-label">Nombre*</label>
-                        <input name="name" type="text" class="form-control" id="input-nombre" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-primer-apellido" class="form-label">Primer Apellido*</label>
-                        <input name="surname" type="text" class="form-control" id="input-primer-apellido" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-segundo-apellido" class="form-label">Segundo Apellido*</label>
-                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido"
-                            required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-dia-nacimiento" class="form-label">Día de Nacimiento*</label>
-                        <input name="day" type="number" class="form-control" id="input-dia-nacimiento" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-mes-nacimiento" class="form-label">Mes de Nacimiento*</label>
-                        <input name="month" type="number" class="form-control" id="input-mes-nacimiento" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-ano-nacimiento" class="form-label">Año de Nacimiento*</label>
-                        <input name="ano" type="number" class="form-control" id="input-ano-nacimiento" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-sexo" class="form-label">Sexo*</label>
-                        <select name="gender" class="form-select" id="input-sexo" required>
-                            <option value="">Seleccione</option>
-                            <option value="Masculino">Masculino</option>
-                            <option value="Femenino">Femenino</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="input-estado" class="form-label">Estado*</label>
-                        <select name="state" class="form-select mb-3" id="input-estado" required>
-                            <option value="">Seleccione</option>
-                            <option value="Aguascalientes">Aguascalientes</option>
-                            <option value="Baja California">Baja California</option>
-                            <option value="Baja California Sur">Baja California Sur</option>
-                            <option value="Campeche">Campeche</option>
-                            <option value="Coahuila">Coahuila</option>
-                            <option value="Colima">Colima</option>
-                            <option value="Chiapas">Chiapas</option>
-                            <option value="Chihuahua">Chihuahua</option>
-                            <option value="Ciudad de México">Ciudad de México</option>
-                            <option value="Durango">Durango</option>
-                            <option value="Guanajuato">Guanajuato</option>
-                            <option value="Guerrero">Guerrero</option>
-                            <option value="Hidalgo">Hidalgo</option>
-                            <option value="Jalisco">Jalisco</option>
-                            <option value="Estado de México">Estado de México</option>
-                            <option value="Michoacán">Michoacán</option>
-                            <option value="Morelos">Morelos</option>
-                            <option value="Nayarit">Nayarit</option>
-                            <option value="Nuevo León">Nuevo León</option>
-                            <option value="Oaxaca">Oaxaca</option>
-                            <option value="Puebla">Puebla</option>
-                            <option value="Querétaro">Querétaro</option>
-                            <option value="Quintana Roo">Quintana Roo</option>
-                            <option value="San Luis Potosí">San Luis Potosí</option>
-                            <option value="Sinaloa">Sinaloa</option>
-                            <option value="Sonora">Sonora</option>
-                            <option value="Tabasco">Tabasco</option>
-                            <option value="Tamaulipas">Tamaulipas</option>
-                            <option value="Tlaxcala">Tlaxcala</option>
-                            <option value="Veracruz">Veracruz</option>
-                            <option value="Yucatán">Yucatán</option>
-                            <option value="Zacatecas">Zacatecas</option>
-                        </select>
-                        <button name="searchDP" class="btn btn-primary float-end">Buscar</button>
-                    </div>
-                </div>
-            </form>
+                <?php endif; ?>
+            </div>
         </div>
-            <script>
-                function mostrarPanel() {
-                    const link = document.querySelector("a[data-bs-toggle='tab'][href='#datos-personales']");
-                    link.click();
-                    panel.classList.add("active");
-                }
-            </script>
-            <?php include("templates/footer.php"); ?>
+    </div>
+
+    <script>
+        // Obtener el elemento select por su ID
+        var selectDiaDP = document.getElementById("input-dia-nacimiento-dp");
+
+        // Generar las opciones del campo de selección de día con un bucle for
+        for (var i = 1; i <= 31; i++) {
+            var optionDP = document.createElement("option");
+            optionDP.value = (i < 10) ? "0" + i : i;;
+
+            // Si el número es menor a 10, se agrega un 0 a la izquierda; de lo contrario, se mantiene igual
+            optionDP.text = (i < 10) ? "0" + i : i;
+
+            selectDiaDP.appendChild(optionDP);
+        }
+
+        // Obtener el elemento select por su ID
+        var selectMesDP = document.getElementById("input-mes-nacimiento-dp");
+
+        // Generar las opciones del campo de selección de día con un bucle for
+        for (var i = 1; i <= 12; i++) {
+            var optionDP = document.createElement("option");
+            optionDP.value = (i < 10) ? "0" + i : i;;
+
+            // Si el número es menor a 10, se agrega un 0 a la izquierda; de lo contrario, se mantiene igual
+            optionDP.text = (i < 10) ? "0" + i : i;
+
+            selectMesDP.appendChild(optionDP);
+        }
+
+
+        // Obtener el elemento select por su ID
+        var selectAnoDP = document.getElementById("input-ano-nacimiento-dp");
+
+        // Generar las opciones del campo de selección de día con un bucle for
+        for (var i = 1940; i <= 2023; i++) {
+            var optionDP = document.createElement("option");
+            optionDP.value = i;
+            optionDP.text = i;
+            selectAnoDP.appendChild(optionDP);
+        }
+    </script>
+
+    <script>
+        function mostrarPanel() {
+            const link = document.querySelector("a[data-bs-toggle='tab'][href='#datos-personales']");
+            link.click();
+            panel.classList.add("active");
+        }
+    </script>
+    <?php include("templates/footer.php"); ?>

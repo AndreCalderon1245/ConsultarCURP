@@ -36,6 +36,9 @@ $url_base="http://localhost/apps/webtest/";
           <li class="nav-item">
             <a class="text-white nav-link" href="#" style="margin-right: 10px;">Gobierno</a>
           </li>
+          <li class="nav-item">
+            <a class="text-white nav-link" href="login.php" style="margin-right: 10px;">Login</a>
+          </li>
         </ul>
       </div>
     </div>
