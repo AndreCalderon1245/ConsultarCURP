@@ -22,51 +22,114 @@ if (isset($_GET["searchDP"])) {
     $state = $_GET["state"];
 
     $query = "SELECT * FROM tbl_curp INNER JOIN tbl_person ON tbl_curp.id_person = tbl_person.id WHERE tbl_person.name = '$name' AND tbl_person.surname = '$surname' AND tbl_person.second_surname = '$second_surname' AND tbl_person.birthday = '$birthday' AND tbl_person.gender = '$gender' AND tbl_person.state = '$state'";
-
+ 
 
     $result = $conexion->query($query);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 }
 
+function generarCURP($name, $surname, $second_surname, $gender, $state, $birthday){
+    // Obtener los valores de los parámetros de la función
+    // No es necesario obtenerlos de $_POST ya que se pasan como parámetros
+    // Además, es posible que los valores de $_POST no estén definidos al llamar a la función
+    $name = strtoupper($name);
+    $surname = strtoupper($surname);
+    $second_surname = strtoupper($second_surname);
+    $year = substr($birthday, 2, 2);
+    $month = substr($birthday, 5, 2);
+    $day = substr($birthday, 8, 2);
+    $gender = strtoupper(substr($gender, 0, 1));
+    $state = strtoupper(substr($state, 0, 2));
+
+    // Generar el CURP
+    $curp = substr($surname, 0, 2) .
+        substr($second_surname, 0, 1) .
+        substr($name, 0, 1) .
+        $year .
+        $month .
+        $day .
+        $gender .
+        $state .
+        calcularHomoclave($surname, $second_surname, $name, $year, $month, $day, $gender, $state);
+
+    // Retornar el CURP generado
+    return $curp;
+}
+
+// Función para calcular la homoclave del CURP
+function calcularHomoclave($surname, $second_surname, $name, $year, $month, $day, $gender, $state){
+    // Concatenar los datos personales y la fecha de nacimiento
+    $datos = $surname . $second_surname . $name . $year . $month . $day . $gender . $state;
+    $suma = 0;
+
+    // Recorrer los caracteres de la cadena y sumar los valores de acuerdo a la tabla de valores
+    for ($i = 0; $i < strlen($datos); $i++) {
+        $valor = 0;
+        $letra = substr($datos, $i, 1);
+        if (preg_match('/[A-Z]/', $letra)) {
+            $valor = ord($letra) - 55;
+        } else {
+            $valor = intval($letra);
+        }
+        $suma += $valor * (18 - $i);
+    }
+
+    // Calcular el residuo de la división entre la suma y 10
+    $residuo = $suma % 10;
+
+    // Retornar la homoclave de acuerdo al residuo calculado
+    if ($residuo === 0) {
+        return "0";
+    } else {
+        return (10 - $residuo);
+    }
+}
+
 // Verificar si el formulario fue enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    //print_r($_POST);
     // Recolectamos los datos del método POST
     $name = isset($_POST["name"]) ? $_POST["name"] : "";
     $surname = isset($_POST["surname"]) ? $_POST["surname"] : "";
     $second_surname = isset($_POST["second_surname"]) ? $_POST["second_surname"] : "";
     $dia = isset($_POST["day"]) ? $_POST["day"] : "";
     $mes = isset($_POST["month"]) ? $_POST["month"] : "";
-    $ano = isset($_POST["ano"]) ? $_POST["ano"] : "";     
+    $ano = isset($_POST["ano"]) ? $_POST["ano"] : "";
     $gender = isset($_POST["gender"]) ? $_POST["gender"] : "";
     $state = isset($_POST["state"]) ? $_POST["state"] : "";
 
     // Concatenamos el valor de dia, mes y año en el formato requerido
     $birthday = isset($_POST["ano"]) && isset($_POST["month"]) && isset($_POST["day"]) ? $_POST["ano"] . "-" . $_POST["month"] . "-" . $_POST["day"] : "";
 
-    // Prepara la insercción de los datos
-    $sentencia = $conexion->prepare("INSERT INTO tbl_person(id,name,surname,second_surname,birthday,gender,state) VALUES (null,:name,:surname,:second_surname,:birthday,:gender,:state)");
+    // Prepara la insercción de los datos en tbl_person
+    $sentencia_person = $conexion->prepare("INSERT INTO tbl_person(id,name,surname,second_surname,birthday,gender,state) VALUES (null,:name,:surname,:second_surname,:birthday,:gender,:state)");
 
-    // Asignando los valores que vienen del método POST
-    $sentencia->bindParam(":name", $name);
-    $sentencia->bindParam(":surname", $surname);
-    $sentencia->bindParam(":second_surname", $second_surname);
-    $sentencia->bindParam(":birthday", $birthday);
-    $sentencia->bindParam(":gender", $gender);
-    $sentencia->bindParam(":state", $state);
-    $sentencia->execute();
+    // Asignando los valores que vienen del método POST en tbl_person
+    $sentencia_person->bindParam(":name", $name);
+    $sentencia_person->bindParam(":surname", $surname);
+    $sentencia_person->bindParam(":second_surname", $second_surname);
+    $sentencia_person->bindParam(":birthday", $birthday);
+    $sentencia_person->bindParam(":gender", $gender);
+    $sentencia_person->bindParam(":state", $state);
+    $sentencia_person->execute();
 
-    // Obtener el ID de la persona insertada
-    $id_persona = $conexion->lastInsertId();
+    $curp = generarCURP($name, $surname, $second_surname, $gender, $state, $birthday);
 
-    // Preparar la inserción del CURP
-    $sentencia = $conexion->prepare("INSERT INTO tbl_curp(id,curp,id_person) VALUES (null,:curp,:id_person)");
-
-    // Asignar los valores a insertar en la tabla tbl_curp
-    $sentencia->bindParam(":id_person", $id_persona);
-    $sentencia->bindParam(":curp", $curp);
-    $sentencia->execute();
+    // Obtener el id insertado en tbl_person
+    $id_person = $conexion->lastInsertId();
+    
+    // Prepara la insercción de los datos en tbl_curp
+    $sentencia_curp = $conexion->prepare("INSERT INTO tbl_curp(id,curp,id_person) VALUES (null,:curp,:id_person)");
+    
+    // Generar y asignar el valor de la curp
+    $sentencia_curp->bindParam(":curp", $curp);
+    
+    // Asignar el id insertado en tbl_person a la tabla tbl_curp
+    $sentencia_curp->bindParam(":id_person", $id_person);
+    
+    // Ejecutar la inserción en tbl_curp
+    $sentencia_curp->execute();
 }
+
 ?>
 
 <?php include("templates/header.php"); ?>
