@@ -22,13 +22,14 @@ if (isset($_GET["searchDP"])) {
     $state = $_GET["state"];
 
     $query = "SELECT * FROM tbl_curp INNER JOIN tbl_person ON tbl_curp.id_person = tbl_person.id WHERE tbl_person.name = '$name' AND tbl_person.surname = '$surname' AND tbl_person.second_surname = '$second_surname' AND tbl_person.birthday = '$birthday' AND tbl_person.gender = '$gender' AND tbl_person.state = '$state'";
- 
+
 
     $result = $conexion->query($query);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 }
 
-function generarCURP($name, $surname, $second_surname, $gender, $state, $birthday){
+function generarCURP($name, $surname, $second_surname, $gender, $state, $birthday)
+{
     // Obtener los valores de los parámetros de la función
     // No es necesario obtenerlos de $_POST ya que se pasan como parámetros
     // Además, es posible que los valores de $_POST no estén definidos al llamar a la función
@@ -57,7 +58,8 @@ function generarCURP($name, $surname, $second_surname, $gender, $state, $birthda
 }
 
 // Función para calcular la homoclave del CURP
-function calcularHomoclave($surname, $second_surname, $name, $year, $month, $day, $gender, $state){
+function calcularHomoclave($surname, $second_surname, $name, $year, $month, $day, $gender, $state)
+{
     // Concatenar los datos personales y la fecha de nacimiento
     $datos = $surname . $second_surname . $name . $year . $month . $day . $gender . $state;
     $suma = 0;
@@ -116,16 +118,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Obtener el id insertado en tbl_person
     $id_person = $conexion->lastInsertId();
-    
+
     // Prepara la insercción de los datos en tbl_curp
     $sentencia_curp = $conexion->prepare("INSERT INTO tbl_curp(id,curp,id_person) VALUES (null,:curp,:id_person)");
-    
+
     // Generar y asignar el valor de la curp
     $sentencia_curp->bindParam(":curp", $curp);
-    
+
     // Asignar el id insertado en tbl_person a la tabla tbl_curp
     $sentencia_curp->bindParam(":id_person", $id_person);
-    
+
     // Ejecutar la inserción en tbl_curp
     $sentencia_curp->execute();
 }
@@ -196,6 +198,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <p><strong>Estado:</strong>
                             <?= $row["state"] ?>
                         </p>
+                    </div>
+                    <div>
+                    <a id="imprimirBtn" class="btn btn-warning float-end" href="print.php?searchCURP=<?php echo $row['curp'];?>">Imprimir</a>
                     </div>
                 </div>
             <?php endif; ?>
@@ -296,6 +301,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <?= $row["curp"] ?>
                         </p>
                     </div>
+                    <a id="imprimirBtn" class="btn btn-warning float-end" href="print.php?searchCURP=<?php echo $row['curp'];?>">Imprimir</a>
                 <?php endif; ?>
                 </div>
         </div>
@@ -383,7 +389,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <option value="Yucatán">Yucatán</option>
                             <option value="Zacatecas">Zacatecas</option>
                         </select>
-                        <button onclick="generarCURP()" name="createCURP" class="btn btn-primary float-end">Generar</button>
+                        <button onclick="generarCURP()" name="createCURP" class="btn btn-primary float-end" style="margin-right:5px">Generar</button>
                     </div>
                 </div>
             </form>
@@ -391,6 +397,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script>
+        function imprimirCURP() {
+            // Obtener los valores de los campos de entrada
+            const name = document.getElementById("name").value;
+            const surname = document.getElementById("surname").value;
+            const secondSurname = document.getElementById("second_surname").value;
+            const day = document.getElementById("input-dia-nacimiento-curp").value;
+            const month = document.getElementById("input-mes-nacimiento-curp").value;
+            const year = document.getElementById("input-ano-nacimiento-curp").value;
+            const gender = document.getElementById("gender").value;
+            const state = document.getElementById("state").value;
+
+            // Crear un nuevo documento PDF
+            const doc = new jsPDF();
+
+            // Agregar la información al documento PDF
+            doc.setFontSize(16);
+            doc.text(`CURP generada para ${name} ${surname} ${secondSurname}`, 20, 20);
+            doc.setFontSize(12);
+            doc.text(`Fecha de nacimiento: ${day}/${month}/${year}`, 20, 30);
+            doc.text(`Sexo: ${gender}`, 20, 40);
+            doc.text(`Estado: ${state}`, 20, 50);
+
+            // Guardar el documento PDF
+            doc.save("CURP.pdf");
+        }
+
         function generarCURP() {
             // Obtener los valores de los campos del formulario
             const nombre = document.querySelector('#name').value.toUpperCase();
@@ -416,6 +448,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Mostrar el CURP generado
             alert(`El CURP generado es: ${curp}`);
+        }
+
+        function mostrarImprimir() {
+            var imprimirBtn = document.getElementById("imprimirBtn");
+            imprimirBtn.style.display = "inline-block";
         }
 
         // Función para calcular la homoclave del CURP

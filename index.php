@@ -53,7 +53,7 @@ if (isset($_GET["searchDP"])) {
                 <button name="searchCURP" class="btn btn-primary float-end">Buscar</button>
             </form>
 
-            <?php if (isset($row) && isset($_GET["searchCURP"])): ?>
+            <?php if (isset($row) && isset($_GET["searchCURP"])) : ?>
                 <h5 class="mt-4">Información encontrada:</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -91,6 +91,9 @@ if (isset($_GET["searchDP"])) {
                             <?= $row["state"] ?>
                         </p>
                     </div>
+                    <div>
+                        <a id="imprimirBtn" class="btn btn-warning float-end" href="print.php?searchCURP=<?php echo $row['curp'];?>">Imprimir</a>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
@@ -109,8 +112,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-segundo-apellido" class="form-label">Segundo Apellido*</label>
-                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido"
-                            required>
+                        <input name="second_surname" type="text" class="form-control" id="input-segundo-apellido" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="input-dia-nacimiento-dp" class="form-label">Día de Nacimiento*</label>
@@ -183,7 +185,7 @@ if (isset($_GET["searchDP"])) {
                     </div>
                 </div>
             </form>
-            <?php if (isset($row) && isset($_GET["searchDP"])): ?>
+            <?php if (isset($row) && isset($_GET["searchDP"])) : ?>
                 <h5>Información encontrada:</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -191,8 +193,11 @@ if (isset($_GET["searchDP"])) {
                             <?= $row["curp"] ?>
                         </p>
                     </div>
+                    <div>
+                        <a id="imprimirBtn" class="btn btn-warning float-end" href="print.php?searchCURP=<?php echo $row['curp'];?>">Imprimir</a>
+                    </div>
                 <?php endif; ?>
-            </div>
+                </div>
         </div>
     </div>
 
